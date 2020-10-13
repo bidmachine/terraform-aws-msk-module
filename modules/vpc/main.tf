@@ -6,8 +6,8 @@ locals {
   public_subnets     = var.public_subnets
   private_subnets    = var.private_subnets
 
-  num_public_subnets  = "${local.create_vpc ? length(local.public_subnets) : 0}"
-  num_private_subnets = "${local.create_vpc ? length(local.private_subnets) : 0}"
+  num_public_subnets  = local.create_vpc ? length(local.public_subnets) : 0
+  num_private_subnets = local.create_vpc ? length(local.private_subnets) : 0
 }
 
 resource "aws_vpc" "this" {
@@ -94,3 +94,4 @@ resource "aws_internet_gateway" "this" {
 
   tags = merge(map("Name", format("%s", local.vpc_name)), var.vpc_tags, var.module_tags)
 }
+

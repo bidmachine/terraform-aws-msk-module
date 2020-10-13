@@ -77,16 +77,19 @@ resource "aws_msk_cluster" "this" {
   tags = merge(map("Name", local.cluster_name), var.msk_cluster_tags, var.tags)
 }
 
-resource "random_string" "suffix" {
-  length  = 8
-  special = false
+resource "random_id" "id" {
+  byte_length = 4
+  keepers = {
+    uuid = uuid()
+  }
 }
 
 resource "aws_msk_configuration" "this" {
   count          = local.count_msk_configuration
   kafka_versions = [local.kafka_version]
-  # Added ranodimise name due problem with https://github.com/terraform-providers/terraform-provider-aws/issues/9082
-  name        = "${var.custom_configuration_name}-${random_string.suffix.result}"
+
+  #name = "${var.custom_configuration_name}-fuck"
+  name        = "${var.custom_configuration_name}-${random_id.id.dec}"
   description = "${var.custom_configuration_description} ${timestamp()}"
 
   server_properties = <<PROPERTIES
@@ -100,3 +103,4 @@ resource "aws_cloudwatch_log_group" "msk_broker_log_group" {
 
   tags = merge(map("Name", local.cluster_name), var.msk_cluster_tags, var.tags)
 }
+
